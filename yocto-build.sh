@@ -155,7 +155,7 @@ do
     w)
         # Try to start an existing/stopped container with thie give name $CONTAINER
         # otherwise, run a new one.
-        YOCTODIR=$OPTARG
+        YOCTODIR=$(readlink -m "$OPTARG")
         if docker inspect $CONTAINER > /dev/null 2>&1 ; then
             INFO "Reattaching to running container $CONTAINER"
             docker start -i ${CONTAINER}
