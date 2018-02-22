@@ -55,3 +55,13 @@ yocto-build --rm
 ```
 
 Then you can setup a new workdir you want.
+
+## Upgrade
+
+Upgrade the script and docker image is easy, just type
+
+```sh
+yocto-build --upgrade
+```
+
+and all things done.

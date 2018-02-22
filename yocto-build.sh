@@ -23,6 +23,8 @@
 
 # SDIR store this script path
 SDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+# SNAME store the script name
+SNAME="$(basename "$(test -L "$0" && readlink "$0" || echo "$0")")"
 
 # check for directory architecture
 YOCTODIR="${SDIR}"
@@ -63,34 +65,39 @@ Usage: $0 <arguments>
 
 Arguments:
 
-	-a, --attach    : attach to current runing container
-        -s, --shell     : spawn a new shell to current container
-        -w, --workdir   : yocto workspace to shared with docker container
-        -r, --rm        : remove current working container
-        -h, --help      : show this help info
+    -a, --attach    : attach to current runing container
+    -s, --shell     : spawn a new shell to current container
+    -w, --workdir   : yocto workspace to shared with docker container
+    -r, --rm        : remove current working container
+    -u, --upgrade   : upgrade this script and pull new image
+    -h, --help      : show this help info
 
 Description:
 
-        The first time you run this script, you should specify yor
-        yocto project directory like following:
+    The first time you run this script, you should specify yor
+    yocto project directory like following:
 
-           $0 --workdir /home/coldnew/poky
+        $0 --workdir /home/coldnew/poky
 
-        This script will help you to pull the docker image and mount
-        the /home/coldnew/poky to container's /yocto directory, and
-        you can build you yocto in this container.
+    This script will help you to pull the docker image and mount
+    the /home/coldnew/poky to container's /yocto directory, and
+    you can build you yocto in this container.
 
-        If you want to attach current running shell, you can use:
+    If you want to attach current running shell, you can use:
 
-           $0 --attach
+        $0 --attach
 
-        If you want to create a new shell, use:
+    If you want to create a new shell, use:
 
-           $0 --shell
+        $0 --shell
 
-        After all build done, you can remove current container by using:
+    After all build done, you can remove current container by using:
 
-           $0 --rm
+        $0 --rm
+
+    To upgrade this script and docker image, type:
+
+        $0 --upgrade
 
 EOF
 }
@@ -102,68 +109,76 @@ if [ -z "$1" ] ;then
 fi
 
 # parsing arguments
-while getopts "asw:rh" OPTION
+while getopts "uasw:rh" OPTION
 do
     case $OPTION in
-        h)
-            usage; exit 0
-            ;;
-        r)
-            if docker inspect $CONTAINER > /dev/null 2>&1 ; then
-                INFO "Remove container: $CONTAINER"
-		docker rm $CONTAINER
-            else
-                INFO "container: $CONTAINER not exist, no need to remove"
-            fi
-            exit 0
-            ;;
-        s)
-            if docker inspect $CONTAINER > /dev/null 2>&1 ; then
-                INFO "Spawn /bin/bash for container: $CONTAINER"
-		docker exec -it $CONTAINER /entrypoint.sh
-            else
-                ERROR "container: $CONTAINER not exist, please use '$0 --workdir <dir to share>' first"
-		exit -1
-            fi
-	    exit 0
-            ;;
-        a)
-            if docker inspect $CONTAINER > /dev/null 2>&1 ; then
-		INFO "Atttach to running container: $CONTAINER"
-		docker attach $CONTAINER
-            else
-                ERROR "container: $CONTAINER not exist, please use '$0 --workdir <dir to share>' first"
-		exit -1
-            fi
-            exit 0
-            ;;
-        w)
-            # Try to start an existing/stopped container with thie give name $CONTAINER
-            # otherwise, run a new one.
-            YOCTODIR=$OPTARG
-            if docker inspect $CONTAINER > /dev/null 2>&1 ; then
-                INFO "Reattaching to running container $CONTAINER"
-                docker start -i ${CONTAINER}
-            else
-                INFO "Creating container $CONTAINER"
-                docker run -it \
-                       --volume="$YOCTODIR:/yocto" \
-                       --volume="${HOME}/.ssh:/home/developer/.ssh" \
-                       --volume="${HOME}/.gitconfig:/home/developer/.gitconfig" \
-                       --volume="/etc/localtime:/etc/localtime:ro" \
-                       --env="DISPLAY" \
-                       --env="QT_X11_NO_MITSHM=1" \
-                       --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
-                       --env=HOST_UID=$(id -u) \
-                       --env=HOST_GID=$(id -g) \
-                       --env=USER=$(whoami) \
-                       --name=$CONTAINER \
-                       $IMAGE
-            fi
-            ;;
-	*)
-	    usage
-	;;
+    u)
+        INFO "Pull new image: $IMAGE"
+        docker pull $IMAGE
+        INFO "Upgrade script $NAME"
+        curl https://raw.githubusercontent.com/coldnew/docker-yocto/master/yocto-build.sh > /tmp/$SNAME
+        mv /tmp/$SNAME $SDIR/$SNAME
+        exit $?
+        ;;
+    h)
+        usage; exit 0
+        ;;
+    r)
+        if docker inspect $CONTAINER > /dev/null 2>&1 ; then
+            INFO "Remove container: $CONTAINER"
+            docker rm $CONTAINER
+        else
+            INFO "container: $CONTAINER not exist, no need to remove"
+        fi
+        exit 0
+        ;;
+    s)
+        if docker inspect $CONTAINER > /dev/null 2>&1 ; then
+            INFO "Spawn /bin/bash for container: $CONTAINER"
+            docker exec -it $CONTAINER /entrypoint.sh
+        else
+            ERROR "container: $CONTAINER not exist, please use '$0 --workdir <dir to share>' first"
+            exit -1
+        fi
+        exit 0
+        ;;
+    a)
+        if docker inspect $CONTAINER > /dev/null 2>&1 ; then
+            INFO "Atttach to running container: $CONTAINER"
+            docker attach $CONTAINER
+        else
+            ERROR "container: $CONTAINER not exist, please use '$0 --workdir <dir to share>' first"
+            exit -1
+        fi
+        exit 0
+        ;;
+    w)
+        # Try to start an existing/stopped container with thie give name $CONTAINER
+        # otherwise, run a new one.
+        YOCTODIR=$OPTARG
+        if docker inspect $CONTAINER > /dev/null 2>&1 ; then
+            INFO "Reattaching to running container $CONTAINER"
+            docker start -i ${CONTAINER}
+        else
+            INFO "Creating container $CONTAINER"
+            docker run -it \
+                   --volume="$YOCTODIR:/yocto" \
+                   --volume="${HOME}/.ssh:/home/developer/.ssh" \
+                   --volume="${HOME}/.gitconfig:/home/developer/.gitconfig" \
+                   --volume="/etc/localtime:/etc/localtime:ro" \
+                   --env="DISPLAY" \
+                   --env="QT_X11_NO_MITSHM=1" \
+                   --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
+                   --env=HOST_UID=$(id -u) \
+                   --env=HOST_GID=$(id -g) \
+                   --env=USER=$(whoami) \
+                   --name=$CONTAINER \
+                   $IMAGE
+        fi
+        ;;
+    *)
+        usage
+        ;;
     esac
 done
 
