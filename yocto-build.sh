@@ -19,7 +19,7 @@
 
 
 # We should not have any trouble on running this script
-set -x
+# set -x
 
 # SDIR store this script path
 SDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
