@@ -120,7 +120,7 @@ do
         s)
             if docker inspect $CONTAINER > /dev/null 2>&1 ; then
                 INFO "Spawn /bin/bash for container: $CONTAINER"
-		docker exec -it $CONTAINER /bin/bash
+		docker exec -it $CONTAINER /entrypoint.sh
             else
                 ERROR "container: $CONTAINER not exist, please use '$0 --workdir <dir to share>' first"
 		exit -1
