@@ -26,4 +26,8 @@ echo 'ALL ALL = (ALL) NOPASSWD: ALL' >> /etc/sudoers
 
 chown -R ${USER_UID}:${USER_GID} /home/${USER}
 
-exec su "${USER}"
+# switch to current user
+su "${USER}"
+
+# enter to shell
+exec /bin/bash
