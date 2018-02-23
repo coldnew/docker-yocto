@@ -161,17 +161,18 @@ do
             docker start -i ${CONTAINER}
         else
             INFO "Creating container $CONTAINER"
+            USER=$(whoami)
             docker run -it \
                    --volume="$YOCTODIR:/yocto" \
-                   --volume="${HOME}/.ssh:/home/developer/.ssh" \
-                   --volume="${HOME}/.gitconfig:/home/developer/.gitconfig" \
+                   --volume="${HOME}/.ssh:/home/${USER}/.ssh" \
+                   --volume="${HOME}/.gitconfig:/home/${USER}/.gitconfig" \
                    --volume="/etc/localtime:/etc/localtime:ro" \
                    --env="DISPLAY" \
                    --env="QT_X11_NO_MITSHM=1" \
                    --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
                    --env=HOST_UID=$(id -u) \
                    --env=HOST_GID=$(id -g) \
-                   --env=USER=$(whoami) \
+                   --env=USER=${USER} \
                    --name=$CONTAINER \
                    $IMAGE
         fi
