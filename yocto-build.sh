@@ -109,7 +109,7 @@ EOF
 
 # NOTE: This requires GNU getopt.  On Mac OS X and FreeBSD, you have
 # to install this separately
-TEMP=`getopt -o uasw:rh --long upgrade,attach,shell,workdir:,rm,help -- "$@"`
+TEMP=`getopt -o uasw:rph --long upgrade,attach,shell,workdir:,rm,pull,help -- "$@"`
 
 if [ $? != 0 ] ; then
     usage
