@@ -12,7 +12,7 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-#
+
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -41,7 +41,7 @@ This function print the MSG with "INFO:" as prefix, and add newline after MSG
 parameter 1: MSG -> message for info
 
 FUNCDOC
-
+    echo -e "\x1b[92m\x1b[1mINFO\x1b[0m:"
     echo -e "\e[92m\e[1mINFO\e[0m: ${1}\n"
 }
 
@@ -102,6 +102,15 @@ Description:
 EOF
 }
 
+# NOTE: This requires GNU getopt.  On Mac OS X and FreeBSD, you have
+# to install this separately
+TEMP=`getopt -o uasw:rh --long upgrade,attach,shell,workdir:,rm,help -- "$@"`
+
+if [ $? != 0 ] ; then
+    usage
+    exit 1
+fi
+
 # if no argument
 if [ -z "$1" ] ;then
     usage
@@ -109,10 +118,10 @@ if [ -z "$1" ] ;then
 fi
 
 # parsing arguments
-while getopts "uasw:rh" OPTION
+while true
 do
-    case $OPTION in
-    u)
+    case "$1" in
+    -u | --upgrade)
         INFO "Pull new image: $IMAGE"
         docker pull $IMAGE
         INFO "Upgrade script $NAME"
@@ -121,19 +130,19 @@ do
         chmod +x $SDIR/$SNAME
         exit $?
         ;;
-    h)
+    -h | --help)
         usage; exit 0
         ;;
-    r)
+    -r | --rm)
         if docker inspect $CONTAINER > /dev/null 2>&1 ; then
             INFO "Remove container: $CONTAINER"
             docker rm $CONTAINER
         else
             INFO "container: $CONTAINER not exist, no need to remove"
         fi
-        exit 0
+        exit $?
         ;;
-    s)
+    -s | --shell)
         if docker inspect $CONTAINER > /dev/null 2>&1 ; then
             INFO "Spawn /bin/bash for container: $CONTAINER"
             docker exec -it $CONTAINER /entrypoint.sh
@@ -141,9 +150,9 @@ do
             ERROR "container: $CONTAINER not exist, please use '$0 --workdir <dir to share>' first"
             exit -1
         fi
-        exit 0
+        exit $?
         ;;
-    a)
+    -a | --attach)
         if docker inspect $CONTAINER > /dev/null 2>&1 ; then
             INFO "Atttach to running container: $CONTAINER"
             docker attach $CONTAINER
@@ -151,12 +160,12 @@ do
             ERROR "container: $CONTAINER not exist, please use '$0 --workdir <dir to share>' first"
             exit -1
         fi
-        exit 0
+        exit $?
         ;;
-    w)
+    -w | --workdir)
         # Try to start an existing/stopped container with thie give name $CONTAINER
         # otherwise, run a new one.
-        YOCTODIR=$(readlink -m "$OPTARG")
+        YOCTODIR=$(readlink -m "$2")
         if docker inspect $CONTAINER > /dev/null 2>&1 ; then
             INFO "Reattaching to running container $CONTAINER"
             docker start -i ${CONTAINER}
@@ -177,9 +186,11 @@ do
                    --name=$CONTAINER \
                    $IMAGE
         fi
+        exit $?
         ;;
     *)
         usage
+        exit $?
         ;;
     esac
 done
