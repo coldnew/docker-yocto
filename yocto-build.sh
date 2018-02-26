@@ -96,9 +96,13 @@ Description:
 
         $0 --rm
 
-    To upgrade this script and docker image, type:
+    To upgrade this script, type:
 
         $0 --upgrade
+
+    To pull the new docker container image, type:
+
+        $0 --pull
 
 EOF
 }
