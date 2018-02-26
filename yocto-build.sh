@@ -69,7 +69,8 @@ Arguments:
     -s, --shell     : spawn a new shell to current container
     -w, --workdir   : yocto workspace to shared with docker container
     -r, --rm        : remove current working container
-    -u, --upgrade   : upgrade this script and pull new image
+    -u, --upgrade   : upgrade this script
+    -p, --pull      : pull new docker container image
     -h, --help      : show this help info
 
 Description:
@@ -122,12 +123,15 @@ while true
 do
     case "$1" in
     -u | --upgrade)
-        INFO "Pull new image: $IMAGE"
-        docker pull $IMAGE
         INFO "Upgrade script $NAME"
         curl https://raw.githubusercontent.com/coldnew/docker-yocto/master/yocto-build.sh > /tmp/$SNAME
         mv /tmp/$SNAME $SDIR/$SNAME
         chmod +x $SDIR/$SNAME
+        exit $?
+        ;;
+    -p | --pull)
+        INFO "Pull new image: $IMAGE"
+        docker pull $IMAGE
         exit $?
         ;;
     -h | --help)
