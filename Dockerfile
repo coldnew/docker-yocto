@@ -33,6 +33,10 @@ RUN apt-get install -y \
     desktop-file-utils libgl1-mesa-dev libglu1-mesa-dev mercurial \
     autoconf automake groff curl lzop asciidoc u-boot-tools
 
+# Install repo tool for some bsp case, like NXP's yocto
+RUN curl http://commondatastorage.googleapis.com/git-repo-downloads/repo > /usr/bin/repo
+RUN chmod a+x /usr/bin/repo
+
 # Set the locale, else yocto will complain
 RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
