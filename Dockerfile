@@ -6,6 +6,9 @@
 FROM ubuntu:14.04
 MAINTAINER Yen-Chin, Lee, coldnew.tw@gmail.com
 
+# Add 32bit package in package list
+RUN dpkg --add-architecture i386
+
 # Update package infos first
 RUN apt-get update -y
 
@@ -33,9 +36,21 @@ RUN apt-get install -y \
     desktop-file-utils libgl1-mesa-dev libglu1-mesa-dev mercurial \
     autoconf automake groff curl lzop asciidoc u-boot-tools
 
+# Extra package for Xilinx PetaLinux
+RUN apt-get install -y xvfb libtool libncurses5-dev libssl-dev zlib1g-dev:i386 tftpd
+
 # Install repo tool for some bsp case, like NXP's yocto
 RUN curl http://commondatastorage.googleapis.com/git-repo-downloads/repo > /usr/bin/repo
 RUN chmod a+x /usr/bin/repo
+
+# Install Java
+RUN \
+  echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
+  add-apt-repository -y ppa:webupd8team/java && \
+  apt-get update && \
+  apt-get install -y oracle-java8-installer && \
+  rm -rf /var/lib/apt/lists/* && \
+  rm -rf /var/cache/oracle-jdk8-installer
 
 # Set the locale, else yocto will complain
 RUN locale-gen en_US.UTF-8
