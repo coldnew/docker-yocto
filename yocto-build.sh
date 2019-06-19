@@ -30,6 +30,7 @@ SNAME="$(basename "$(test -L "$0" && readlink "$0" || echo "$0")")"
 YOCTODIR="${SDIR}"
 IMAGE="coldnew/yocto-build"
 CONTAINER="yocto-build"
+DOCKER_ARGS=""
 
 ############################################################
 #### Library for common usage functions
@@ -57,6 +58,61 @@ FUNCDOC
 }
 
 ############################################################
+
+function read_config {
+    : << FUNCDOC
+
+This function source the ~/.yocto-build.sh to modify some variable of this script.
+
+The variables supported are:
+
+  IMAGE
+
+     The docker image you want to use, default: coldnew/yocto-build
+
+     example:
+
+       IMAGE="coldnew/yocto-build"
+
+
+  CONTAINER
+
+     The docker container name you use, default: yocto-build
+
+     example:
+
+       CONTAINER="yocto-build"
+
+  DOCKER_ARGS
+
+     Extra docker args you want to pass to it when create container
+
+     example:
+
+       DOCKER_ARGS=' --volume="${HOME}:${HOME}" --volume="/tmp:/tmp" '
+
+FUNCDOC
+
+    if [ -e "${HOME}/.yocto-build.sh" ]; then
+        INFO "Read config from: ${HOME}/.yocto-build.sh"
+        source "${HOME}/.yocto-build.sh"
+
+        if [ "$IMAGE" != "coldnew/yocto-build" ]; then
+            INFO "CONTAINER: $CONTAINER"
+        fi
+
+        if [ "$CONTAINER" != "yocto-build" ]; then
+            INFO "CONTAINER: $CONTAINER"
+        fi
+
+        if [ "$DOCKER_ARGS" != "" ]; then
+            INFO "DOCKER_ARGS: $DOCKER_ARGS"
+        fi
+
+    else
+        INFO "No config file ${HOME}/.yocto-build.sh to read!"
+    fi
+}
 
 function usage {
     cat <<EOF
@@ -180,6 +236,7 @@ do
         else
             INFO "Creating container $CONTAINER"
             USER=$(whoami)
+            read_config
             docker run -it \
                    --volume="$YOCTODIR:/yocto" \
                    --volume="${HOME}/.ssh:/home/${USER}/.ssh" \
@@ -191,6 +248,7 @@ do
                    --env=HOST_UID=$(id -u) \
                    --env=HOST_GID=$(id -g) \
                    --env=USER=${USER} \
+                   $(eval echo ${DOCKER_ARGS}) \
                    --name=$CONTAINER \
                    $IMAGE
         fi
