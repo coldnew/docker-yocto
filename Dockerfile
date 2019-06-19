@@ -18,7 +18,7 @@ RUN apt-get update -y
 # Essentials
 RUN apt-get install -y gawk wget git-core diffstat unzip texinfo gcc-multilib \
      build-essential chrpath socat cpio python python3 python3-pip python3-pexpect \
-     xz-utils debianutils iputils-ping vim bc g++-multilib
+     xz-utils debianutils iputils-ping vim bc g++-multilib bash
 
 # Graphical and Eclipse Plug-In Extras
 RUN apt-get install -y libsdl1.2-dev xterm
@@ -58,6 +58,11 @@ RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
+
+# make /bin/sh symlink to bash instead of dash
+# Xilinx's petalinux need this
+RUN echo "dash dash/sh boolean false" | debconf-set-selections
+RUN DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash
 
 # default workdir is /yocto
 WORKDIR /yocto
