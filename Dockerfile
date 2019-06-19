@@ -45,13 +45,13 @@ RUN chmod a+x /usr/bin/repo
 
 # Install Java
 RUN \
-  echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
+  echo oracle-java11-installer shared/accepted-oracle-license-v1-2 select true | debconf-set-selections && \
   apt-get install -y software-properties-common && \
-  add-apt-repository -y ppa:webupd8team/java && \
+  add-apt-repository -y ppa:linuxuprising/java && \
   apt-get update && \
-  apt-get install -y oracle-java8-installer && \
+  apt-get install -y oracle-java11-installer && \
   rm -rf /var/lib/apt/lists/* && \
-  rm -rf /var/cache/oracle-jdk8-installer
+  rm -rf /var/cache/oracle-jdk11-installer
 
 # Set the locale, else yocto will complain
 RUN locale-gen en_US.UTF-8
