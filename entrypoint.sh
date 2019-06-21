@@ -19,7 +19,7 @@ USER_UID=${HOST_UID:=$UID}
 USER_GID=${HOST_GID:=$GID}
 
 # Create Group
-groupadd ${USER_GID}
+groupadd ${USER_GID} > /dev/null 2>&1
 
 # Create user
 useradd ${USER} --shell /bin/bash --create-home \
@@ -27,7 +27,7 @@ useradd ${USER} --shell /bin/bash --create-home \
 
 echo 'ALL ALL = (ALL) NOPASSWD: ALL' >> /etc/sudoers
 
-chown -R ${USER_UID}:${USER_GID} /home/${USER}
+chown -R ${USER_UID}:${USER_GID} /home/${USER} > /dev/null 2>&1
 
 # switch to current user
 su "${USER}"
