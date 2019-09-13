@@ -36,7 +36,7 @@ USER_UID=${HOST_UID:=$UID}
 USER_GID=${HOST_GID:=$GID}
 
 # Create Group
-groupadd ${USER_GID} > /dev/null 2>&1
+groupadd ${USER} --gid ${USER_GID} > /dev/null 2>&1
 
 # Create user
 useradd ${USER} --shell /bin/bash --create-home \
