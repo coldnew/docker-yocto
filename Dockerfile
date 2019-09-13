@@ -49,9 +49,9 @@ RUN \
   apt-get install -y software-properties-common && \
   add-apt-repository -y ppa:linuxuprising/java && \
   apt-get update && \
-  apt-get install -y oracle-java11-installer && \
+  apt-get install -y oracle-java11-installer-local && \
   rm -rf /var/lib/apt/lists/* && \
-  rm -rf /var/cache/oracle-jdk11-installer
+  rm -rf /var/cache/oracle-jdk11-installer-local
 
 # Set the locale, else yocto will complain
 RUN locale-gen en_US.UTF-8
