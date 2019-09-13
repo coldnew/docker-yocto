@@ -44,14 +44,14 @@ RUN curl http://commondatastorage.googleapis.com/git-repo-downloads/repo > /usr/
 RUN chmod a+x /usr/bin/repo
 
 # Install Java
-RUN \
-  echo oracle-java11-installer shared/accepted-oracle-license-v1-2 select true | debconf-set-selections && \
-  apt-get install -y software-properties-common && \
-  add-apt-repository -y ppa:linuxuprising/java && \
-  apt-get update && \
-  apt-get install -y oracle-java11-installer-local && \
-  rm -rf /var/lib/apt/lists/* && \
-  rm -rf /var/cache/oracle-jdk11-installer-local
+#RUN \
+#  echo oracle-java11-installer shared/accepted-oracle-license-v1-2 select true | debconf-set-selections && \
+#  apt-get install -y software-properties-common && \
+#  add-apt-repository -y ppa:linuxuprising/java && \
+#  apt-get update && \
+#  apt-get install -y oracle-java11-installer-local && \
+#  rm -rf /var/lib/apt/lists/* && \
+#  rm -rf /var/cache/oracle-jdk11-installer-local
 
 # Set the locale, else yocto will complain
 RUN locale-gen en_US.UTF-8
