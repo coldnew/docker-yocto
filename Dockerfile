@@ -3,7 +3,7 @@
 # Author:  Yen-Chin, Lee <yenchin@weintek.com>
 # Command format: Instruction [arguments / command] ..
 
-FROM ubuntu:14.04
+FROM ubuntu:16.04
 MAINTAINER Yen-Chin, Lee, coldnew.tw@gmail.com
 
 # Add 32bit package in package list
@@ -54,6 +54,7 @@ RUN chmod a+x /usr/bin/repo
 #  rm -rf /var/cache/oracle-jdk11-installer-local
 
 # Set the locale, else yocto will complain
+RUN apt-get install locales -y
 RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
