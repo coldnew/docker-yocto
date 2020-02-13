@@ -55,7 +55,8 @@ RUN chmod a+x /usr/bin/repo
 
 # Set the locale, else yocto will complain
 RUN apt-get install locales -y
-RUN locale-gen en_US.UTF-8
+RUN locale-gen en_US.UTF-8 && \
+	DEBIAN_FRONTEND=noninteractive dpkg-reconfigure locales
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
