@@ -37,7 +37,7 @@ RUN apt-get install -y \
     autoconf automake groff curl lzop asciidoc u-boot-tools busybox
 
 # Extra package for Xilinx PetaLinux
-RUN apt-get install -y xvfb libtool libncurses5-dev libssl-dev zlib1g-dev:i386 tftpd
+RUN apt-get install -y xvfb libtool libncurses5-dev libssl-dev zlib1g-dev:i386 tftpd net-tools
 
 # Install repo tool for some bsp case, like NXP's yocto
 RUN curl http://commondatastorage.googleapis.com/git-repo-downloads/repo > /usr/bin/repo
