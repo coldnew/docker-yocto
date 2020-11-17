@@ -46,12 +46,12 @@ RUN apt-get install -y \
 # Extra package for Xilinx PetaLinux
 RUN apt-get install -y xvfb libtool libncurses5-dev libssl-dev zlib1g-dev:i386 tftpd net-tools
 
-# Install gcc9 for build chromium
-RUN apt-get install build-essential software-properties-common -y &&  \
+# Install gcc10 for build chromium and gn-native
+RUN apt-get install build-essential software-properties-common -y && \
     add-apt-repository ppa:ubuntu-toolchain-r/test -y && \
-    apt-get update -y &&  \
-    apt-get install gcc-9 g++-9 gcc-9-multilib lib32objc-9-dev lib32stdc++-9-dev lib32gcc-9-dev libobjc-9-dev libstdc++-9-dev libgcc-9-dev  -y &&  \
-    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-9 &&  \
+    apt-get update -y && \
+    apt-get install gcc-10 g++-10 -y && \
+    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 60 --slave /usr/bin/g++ g++ /usr/bin/g++-10 && \
     update-alternatives --config gcc
 
 # Install repo tool for some bsp case, like NXP's yocto
