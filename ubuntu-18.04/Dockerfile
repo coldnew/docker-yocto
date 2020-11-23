@@ -82,7 +82,7 @@ RUN echo "dash dash/sh boolean false" | debconf-set-selections
 RUN DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash
 
 # Extra packages I want
-RUN apt-get install -y rsync
+RUN apt-get install -y rsync fakeroot fakechroot
 
 # default workdir is /yocto
 WORKDIR /yocto
