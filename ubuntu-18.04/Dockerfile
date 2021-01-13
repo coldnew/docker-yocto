@@ -58,6 +58,9 @@ RUN apt-get install build-essential software-properties-common -y && \
 RUN curl http://commondatastorage.googleapis.com/git-repo-downloads/repo > /usr/bin/repo
 RUN chmod a+x /usr/bin/repo
 
+# Install nfs-utils
+RUN apt-get install nfs-common -y
+
 # Install Java
 #RUN \
 #  echo oracle-java11-installer shared/accepted-oracle-license-v1-2 select true | debconf-set-selections && \
