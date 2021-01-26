@@ -85,7 +85,7 @@ RUN echo "dash dash/sh boolean false" | debconf-set-selections
 RUN DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash
 
 # Extra packages I want
-RUN apt-get install -y rsync fakeroot fakechroot
+RUN apt-get install -y rsync fakeroot fakechroot libpython2.7 python-setuptools
 
 # default workdir is /yocto
 WORKDIR /yocto
