@@ -3,22 +3,29 @@
 # Author:  Yen-Chin, Lee <yenchin@weintek.com>
 # Command format: Instruction [arguments / command] ..
 
-FROM ubuntu:14.04
+FROM ubuntu:22.04
 MAINTAINER Yen-Chin, Lee, coldnew.tw@gmail.com
+
+# Disable interactive functions
+ENV DEBIAN_FRONTEND noninteractive
 
 # Add 32bit package in package list
 RUN dpkg --add-architecture i386
+RUN sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list
 
 # Update package infos first
 RUN apt-get update -y
 
 ## Install requred packages:
 # http://www.yoctoproject.org/docs/current/ref-manual/ref-manual.html
+RUN apt-get -y build-dep qemu  && \
+    apt-get -y remove oss4-dev
 
 # Essentials
 RUN apt-get install -y gawk wget git-core diffstat unzip texinfo gcc-multilib \
-     build-essential chrpath socat cpio python python3 python3-pip python3-pexpect \
-     xz-utils debianutils iputils-ping vim bc g++-multilib bash realpath
+     build-essential chrpath socat tar  python3 python3-pip python3-pexpect \
+     debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev \
+     xterm cpio vim
 
 # Graphical and Eclipse Plug-In Extras
 RUN apt-get install -y libsdl1.2-dev xterm
@@ -27,17 +34,17 @@ RUN apt-get install -y libsdl1.2-dev xterm
 RUN apt-get install -y make xsltproc docbook-utils fop dblatex xmlto
 
 # OpenEmbedded Self-Test
-RUN apt-get install -y python-git
+#RUN apt-get install -y python-git
 
 # Extra package for build with NXP's images
 RUN apt-get install -y \
     sed cvs subversion coreutils texi2html \
-    python-pysqlite2 help2man  gcc g++ \
+    help2man  gcc g++ \
     desktop-file-utils libgl1-mesa-dev libglu1-mesa-dev mercurial \
     autoconf automake groff curl lzop asciidoc u-boot-tools busybox
 
 # Extra package for Xilinx PetaLinux
-RUN apt-get install -y xvfb libtool libncurses5-dev libssl-dev zlib1g-dev:i386 tftpd net-tools
+# RUN apt-get install -y xvfb libtool libncurses5-dev libssl-dev zlib1g-dev:i386 tftpd
 
 # Install repo tool for some bsp case, like NXP's yocto
 RUN curl http://commondatastorage.googleapis.com/git-repo-downloads/repo > /usr/bin/repo
@@ -54,7 +61,9 @@ RUN chmod a+x /usr/bin/repo
 #  rm -rf /var/cache/oracle-jdk11-installer-local
 
 # Set the locale, else yocto will complain
-RUN locale-gen en_US.UTF-8
+RUN apt-get install locales -y
+RUN locale-gen en_US.UTF-8 && \
+	DEBIAN_FRONTEND=noninteractive dpkg-reconfigure locales
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
