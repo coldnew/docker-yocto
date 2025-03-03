@@ -87,6 +87,14 @@ RUN DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash
 # Extra packages I want
 RUN apt-get install -y rsync fakeroot fakechroot libpython2.7 python-setuptools
 
+# update to glibc 2.31 by use ubuntu 20.04 source
+# update glibc to 2.31 by use ubuntu 20.04
+RUN echo 'deb http://archive.ubuntu.com/ubuntu/ focal main' >> /etc/apt/sources.list.d/focal.list && \
+    echo 'deb-src http://archive.ubuntu.com/ubuntu/ focal main' >> /etc/apt/sources.list.d/focal.list && \
+    apt update -y && \
+    apt install -y libc6 libc6-dev && \
+    rm -rf /etc/apt/sources.list.d/focal.list
+
 # default workdir is /yocto
 WORKDIR /yocto
 
